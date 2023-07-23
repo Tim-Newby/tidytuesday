@@ -8,8 +8,6 @@ library(tidyverse)
 # Install from CRAN via: install.packages("tidytuesdayR")
 # This loads the readme and all the datasets for the week of interest
 
-# Added comment for trial git push
-
 
 tuesdata <- tidytuesdayR::tt_load('2023-07-04')
 historical_markers <- tuesdata$`historical_markers`
