@@ -1,0 +1,90 @@
+---
+title: "Tidytuesday_20230711"
+format: html
+editor: visual
+---
+
+## About TidyTuesday
+
+TidyTuesday is a weekly social data project. All are welcome to participate! Please remember to share the code used to generate your results! TidyTuesday is organized by the R4DS Online Learning Community. Join our Slack for free online help with R and other data-related topics, or to participate in a data-related book club! It's about practicining data analysis techniques rather than drawing conclusions as to causation.
+
+## Loading packages and getting the data
+
+Using tidytuesdayr to read data from https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-07-11 and tidyverse for analysis.
+
+```{r}
+#| label: setup
+library(tidytuesdayR)
+library(tidyverse)
+
+tuesdata <- tidytuesdayR::tt_load('2023-07-11')
+
+globaltemps <- tuesdata[[1]]
+nhtemps <- tuesdata[[2]]
+shtemps <- tuesdata[[3]]
+zonanntemps <- tuesdata[[4]]
+
+```
+
+##Initial inspection
+
+```{r}
+#| label: summary_global
+summary(globaltemps)
+```
+
+```{r}
+#| label: summary_nh
+summary(nhtemps)
+
+```
+
+```{r}
+#| label: summary_sh
+summary(shtemps)
+```
+
+```{r}
+#| label: summary_z
+summary(zonanntemps)
+```
+
+It looks like global, nh and sh are monthly and seasonal averages for temperatures relative to a given reference temperature throughtout the world , the northern hemisphere and southern hemisphere respectively whilst zonann temps look like annual averages of relative temperatures for the above areas and for different zones of latitude (equatorial, 0-24^o^ North/South, 24-44^o^ North/South, 44-64^o^ North/South and , 64-90^o^ North/South).
+
+Let's start by plotting changes in global temps.
+
+```{r}
+
+y.expression <- expression(Deviation ^o~C)
+
+zonanntemps |> 
+  select(Year, Glob) |> 
+  ggplot(mapping = aes(Year, Glob)) + 
+  geom_col(aes(fill = Glob), show.legend = FALSE) +
+  scale_fill_distiller(palette = "Spectral") +
+  labs(title = "Deviation of global mean temperature from its 1951 to 1980 mean,\nbetween 1880 and 2022 ",
+       caption = "https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-07-11",
+       x = "Year",
+       y = y.expression)
+  
+```
+
+And the same plot for the part of the world where I live shows a greater increase in relative temperatures than the global average:
+
+```{r}
+gst <- zonanntemps |> 
+  select(Year, hi_north = `24N-90N`)
+
+y.expression <- expression(Deviation ^o~C)
+
+  ggplot(gst, mapping = aes(Year, hi_north)) + 
+  geom_col(aes(fill = hi_north), show.legend = FALSE) +
+  scale_fill_distiller(palette = "Spectral") +
+  labs(title = "Deviation of global mean temperature from its 1951 to 1980 mean,\nbetween 1880 and 2022 ",
+       caption = "https://github.com/rfordatascience/tidytuesday/tree/master/data/2023/2023-07-11",
+       x = "Year",
+       y = y.expression)
+
+```
+
+How about average summer temperatures in the northern hemisphere

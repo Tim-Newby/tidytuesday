@@ -1,0 +1,69 @@
+---
+title: "Tidytuesday_20230704_historicmarkers"
+author: "Tim Newby"
+---
+
+# Historical Markers
+
+Part of the Tidy Tuesday series published by the  R4DS Online Learning Community (2023). Tidy Tuesday: A weekly social data project. https://github.com/rfordatascience/tidytuesday.
+
+The data this week comes from the Historical Marker Database USA Index. Learn more about the markers on the HMDb.org site, which includes a number of articles, including Database Counts and Statistics.
+
+We included a dataset of places that do not have entries in the Historical Markers Database. You might try to combine that with information from geonames.org (code: HSTS) to find markers that need to be submitted. Thanks to Jesus M. Castagnetto for the geonames tip!
+
+## Setup and read in data
+
+Using libraries tidytuesdayR to read the data in and tidyverse for analysis.  Data is also saved locally but not sure if this is good practice - seems unneccessary?
+
+
+```{r}
+
+library(tidytuesdayR)
+library(tidyverse)
+
+tuesdata <- tidytuesdayR::tt_load('2023-07-04')
+historical_markers <- tuesdata$`historical_markers`
+no_markers <- tuesdata$`no_markers`
+write.csv(historical_markers, "historical_markers")
+write.csv(historical_markers, "no_markers")
+
+```
+
+## Inspection of data
+
+To start with will just look at counties for which historical markers are listed (historical_markers)
+
+```{r}
+
+summary(historical_markers)
+
+
+```
+
+A lot of NAs in year erected - is this some states record the data and others don't
+
+```{r}
+
+historical_markers |> group_by(state_or_prov) |> 
+  summarise(n = n(), na = sum(is.na(year_erected)))
+
+```
+
+There's no obvious pattern as to why year erected isn't always available.  
+
+The most obvious question is where are the markers. The other obvious question - when were they put up is a bit less interesting as it's not clear where the gaps in the data are. Also would be interesting to have date on year of event being marked.
+
+Start with simple map plot.  Map data is readily available for the USA without geographical outliers so will merge our data set with this anf exclude states not in the map dataset to simplify the initial plot
+
+```{r}
+map <- map_data("state") 
+
+ggplot(data = map, aes(x = long, y = lat)) +
+  geom_polygon(fill = "white")
+
+ 
+```
+
+
+
+
